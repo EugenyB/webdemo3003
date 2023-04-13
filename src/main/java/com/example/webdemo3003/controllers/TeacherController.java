@@ -47,8 +47,28 @@ public class TeacherController {
 
     @GetMapping("/delete_teacher")
     public String deleteTeacher(@RequestParam long id) {
-        //TODO Confirmation for delete
         teacherRepository.deleteById(id);
+        return "redirect:/teachers";
+    }
+
+    @GetMapping("/edit_teacher")
+    public String editTeacher(@RequestParam long id, Model model) {
+        Optional<Teacher> optionalTeacher = teacherRepository.findById(id);
+        if (optionalTeacher.isEmpty()) {
+            return "redirect:/teachers";
+        }
+        model.addAttribute("teacher", optionalTeacher.get());
+        return "edit_teacher";
+    }
+
+    @PostMapping("/update_teacher")
+    public String updateTeacher(@RequestParam long id, @RequestParam("tname") String name, @RequestParam int experience) {
+        Optional<Teacher> optionalTeacher = teacherRepository.findById(id);
+        optionalTeacher.ifPresent(t -> {
+            t.setName(name);
+            t.setExperience(experience);
+            teacherRepository.save(t);
+        });
         return "redirect:/teachers";
     }
 }
